@@ -1,13 +1,13 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
+import 'package:flutter_bitshares/login/bloc/bloc.dart';
+import 'package:flutter_bitshares/login/login_screen.dart';
+import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bitshares/home/home_screen.dart';
 import 'package:flutter_bitshares/network_service.dart';
-import 'package:flutter_bitshares/pages/home_page.dart';
-import 'package:flutter_bitshares/pages/login_page.dart';
 import 'package:flutter_bitshares/repositories/user_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:logging/logging.dart';
 
 final Logger log = Logger('Main');
 
@@ -68,7 +68,7 @@ class _AppState extends State<BitsharesWalletApp> {
   void initState() {
     super.initState();
     _authBloc = AuthBloc(userRepository: _userRepository);
-    _authBloc.dispatch(AppStarted());
+    _authBloc.dispatch(AppStartedEvent());
   }
 
   @override
@@ -89,17 +89,17 @@ class _AppState extends State<BitsharesWalletApp> {
         home: BlocBuilder<AuthEvent, AuthState>(
           bloc: _authBloc,
           builder: (BuildContext context, AuthState state) {
-            if (state is AuthUninit) {
+            if (state is AuthUninitState) {
               return SplashPage();
             }
-            if (state is Authenticated || state is Registered) {
-              return HomePage();
+            if (state is AuthenticatedState || state is RegisteredState) {
+              return HomeScreen();
             }
-            if (state is UnAuthenticated) {
-              return LoginPage(userRepository: _userRepository);
+            if (state is UnAuthenticatedState) {
+              return LoginScreen(userRepository: _userRepository);
             }
-            if (state is AuthLoading) {
-              return LoadingScreen();
+            if (state is AuthLoadingState) {
+              return LoadingPage();
             }
           },
         ),
@@ -118,7 +118,7 @@ class SplashPage extends StatelessWidget {
   }
 }
 
-class LoadingScreen extends StatelessWidget {
+class LoadingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,70 +128,3 @@ class LoadingScreen extends StatelessWidget {
     );
   }
 }
-
-class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final UserRepository userRepository;
-
-  AuthBloc({@required this.userRepository}) : assert(userRepository != null);
-
-  @override
-  AuthState get initialState => AuthUninit();
-
-  @override
-  Stream<AuthState> mapEventToState(
-      AuthState currentState, AuthEvent event) async* {
-    if (event is AppStarted) {
-      final bool isAuth = await userRepository.isAuth();
-      if (isAuth) {
-        yield Authenticated();
-      } else {
-        yield UnAuthenticated();
-      }
-    }
-    if (event is SignIn) {
-      yield AuthLoading();
-      await userRepository.auth(event.wallet);
-      yield Authenticated();
-    }
-    if (event is SignUp) {
-      yield AuthLoading();
-      await userRepository.auth(event.wallet);
-      yield Registered();
-    }
-    if (event is LoggedOut) {
-      yield AuthLoading();
-      await userRepository.signOut();
-      yield UnAuthenticated();
-    }
-  }
-}
-
-class AuthEvent extends Equatable {
-  AuthEvent([List props = const []]) : super(props);
-}
-
-class AppStarted extends AuthEvent {}
-
-class SignIn extends AuthEvent {
-  final String wallet;
-  SignIn({@required this.wallet}) : super([wallet]);
-}
-
-class SignUp extends AuthEvent {
-  final String wallet;
-  SignUp({@required this.wallet}) : super([wallet]);
-}
-
-class LoggedOut extends AuthEvent {}
-
-class AuthState extends Equatable {}
-
-class AuthUninit extends AuthState {}
-
-class AuthLoading extends AuthState {}
-
-class UnAuthenticated extends AuthState {}
-
-class Registered extends AuthState {}
-
-class Authenticated extends AuthState {}

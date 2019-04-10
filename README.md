@@ -8,6 +8,7 @@ Port of the https://github.com/Agorise/bitsy-wallet
 * https://github.com/felangel/Bloc/tree/master/examples/flutter_login
 * https://github.com/go-nas/app-freenas
 * https://github.com/jasonsoft/learning-flutter
+* https://github.com/centrifugal/centrifuge-dart
 
 ## UI & UX:
 * https://github.com/bananocoin/kalium_wallet_flutter
@@ -16,9 +17,14 @@ Port of the https://github.com/Agorise/bitsy-wallet
 * https://github.com/trentpiercy/trace
 
 ## Articles:
+* https://habr.com/ru/post/438574/
+* https://habr.com/ru/post/435780/
+* https://medium.com/flutter-community/flutter-app-architecture-101-vanilla-scoped-model-bloc-7eff7b2baf7e
 * https://medium.com/flutter-community/flutter-widgets-deep-dive-part-1-square-peg-in-a-round-hole-generics-in-dart-358eadb23d2d
 * https://medium.com/flutter-community/flutter-login-tutorial-with-flutter-bloc-ea606ef701ad  
 * https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
+* https://medium.com/flutter-community/flutter-layout-cheat-sheet-5363348d037e
+* https://medium.com/flutter-community/let-me-help-you-to-understand-and-choose-a-state-management-solution-for-your-app-9ffeac834ee3
 
 ## Tools:
 * https://code.visualstudio.com/

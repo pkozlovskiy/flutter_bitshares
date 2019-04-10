@@ -1,33 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bitshares/pages/login_page.dart';
+import 'package:flutter_bitshares/login/bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SignUpPage extends StatefulWidget {
+class SignInPage extends StatefulWidget {
   final LoginBloc loginBloc;
 
-  SignUpPage({Key key, this.loginBloc}) : super(key: key);
+  SignInPage({Key key, this.loginBloc}) : super(key: key);
 
   @override
-  _SignUpPageState createState() => _SignUpPageState();
+  _SignInPageState createState() => _SignInPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignInPageState extends State<SignInPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _passwordConfirmController = TextEditingController();
 
   LoginBloc get _loginBloc => widget.loginBloc;
 
   final _formKey = GlobalKey<FormState>();
-  final format1 = RegExp(".*[A-Z]+.*");
-  final format2 = RegExp(".*[a-z]+.*");
-  final format3 = RegExp(".*[0-9]+.*");
+
+  @override
+  void initState() {
+    _usernameController.addListener(_onUsernameChanged);
+    _passwordController.addListener(_onPasswordChanged);
+    super.initState();
+  }
 
   @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
+    _loginBloc.dispose();
     super.dispose();
   }
 
@@ -44,6 +48,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ));
             });
           }
+
           return Form(
             key: _formKey,
             child: Column(
@@ -52,59 +57,53 @@ class _SignUpPageState extends State<SignUpPage> {
                     autofocus: false,
                     controller: _usernameController,
                     validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Enter username';
-                      }
+                      _loginBloc.validateUsername(value);
                     },
                     maxLines: 1,
-                    decoration:
-                        InputDecoration(filled: true, labelText: 'Username')),
+                    decoration: InputDecoration(
+                        filled: true,
+                        labelText: state is UsernameExist
+                            ? state.userAccount.id
+                            : 'Username')),
                 TextFormField(
                   controller: _passwordController,
                   maxLines: 1,
                   validator: (value) {
-                    if (value.length < 8)
-                      return 'Password lenth must be at least 8 symbols';
-                    if (!format1.hasMatch(value))
-                      return 'Password must contains uppercase';
-                    if (!format2.hasMatch(value))
-                      return 'Password must contains lowercase';
-                    if (!format3.hasMatch(value))
-                      return 'Password must contains digits';
+                    _loginBloc.validatePassword(value);
                   },
                   decoration:
                       InputDecoration(filled: true, labelText: 'Password'),
                   obscureText: true,
                 ),
-                TextFormField(
-                  controller: _passwordConfirmController,
-                  validator: (value) {
-                    if (value != _passwordController.text) {
-                      return 'Passwords must be the same';
-                    }
-                  },
-                  maxLines: 1,
-                  decoration: InputDecoration(
-                      filled: true, labelText: 'Confirm Password'),
-                  obscureText: true,
-                ),
                 ButtonBar(
                   children: <Widget>[
                     RaisedButton(
-                        child: Text('SIGNUP'),
+                        child: Text('SIGNIN'),
                         onPressed: () {
                           if (_formKey.currentState.validate()) {
-                            _loginBloc.dispatch(SignUpPressed(
+                            _loginBloc.dispatch(SignInPressed(
                                 username: _usernameController.text,
                                 pass: _passwordController.text));
                           }
                         }),
                   ],
-                )
+                ),
+                Container(
+                    child: state is LoginLoading
+                        ? CircularProgressIndicator()
+                        : null)
               ],
             ),
           );
         });
+  }
+
+  void _onUsernameChanged() {
+    _loginBloc.dispatch(UsernameChanged(_usernameController.text));
+  }
+
+  void _onPasswordChanged() {
+    _loginBloc.dispatch(PasswordChanged(_passwordController.text));
   }
 }
 

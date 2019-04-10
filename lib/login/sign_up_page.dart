@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bitshares/pages/login_page.dart';
+import 'package:flutter_bitshares/login/bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SignInPage extends StatefulWidget {
+class SignUpPage extends StatefulWidget {
   final LoginBloc loginBloc;
 
-  SignInPage({Key key, this.loginBloc}) : super(key: key);
+  SignUpPage({Key key, this.loginBloc}) : super(key: key);
 
   @override
-  _SignInPageState createState() => _SignInPageState();
+  _SignUpPageState createState() => _SignUpPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignUpPageState extends State<SignUpPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _passwordConfirmController = TextEditingController();
 
   LoginBloc get _loginBloc => widget.loginBloc;
 
   final _formKey = GlobalKey<FormState>();
+  final format1 = RegExp(".*[A-Z]+.*");
+  final format2 = RegExp(".*[a-z]+.*");
+  final format3 = RegExp(".*[0-9]+.*");
 
   @override
   void dispose() {
@@ -40,7 +44,6 @@ class _SignInPageState extends State<SignInPage> {
               ));
             });
           }
-
           return Form(
             key: _formKey,
             child: Column(
@@ -60,21 +63,38 @@ class _SignInPageState extends State<SignInPage> {
                   controller: _passwordController,
                   maxLines: 1,
                   validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Enter password';
-                    }
+                    if (value.length < 8)
+                      return 'Password lenth must be at least 8 symbols';
+                    if (!format1.hasMatch(value))
+                      return 'Password must contains uppercase';
+                    if (!format2.hasMatch(value))
+                      return 'Password must contains lowercase';
+                    if (!format3.hasMatch(value))
+                      return 'Password must contains digits';
                   },
                   decoration:
                       InputDecoration(filled: true, labelText: 'Password'),
                   obscureText: true,
                 ),
+                TextFormField(
+                  controller: _passwordConfirmController,
+                  validator: (value) {
+                    if (value != _passwordController.text) {
+                      return 'Passwords must be the same';
+                    }
+                  },
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                      filled: true, labelText: 'Confirm Password'),
+                  obscureText: true,
+                ),
                 ButtonBar(
                   children: <Widget>[
                     RaisedButton(
-                        child: Text('SIGNIN'),
+                        child: Text('SIGNUP'),
                         onPressed: () {
                           if (_formKey.currentState.validate()) {
-                            _loginBloc.dispatch(SignInPressed(
+                            _loginBloc.dispatch(SignUpPressed(
                                 username: _usernameController.text,
                                 pass: _passwordController.text));
                           }
