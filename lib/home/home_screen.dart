@@ -16,10 +16,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  TabController _controller;
+
   @override
   Widget build(BuildContext context) {
-    TabController _controller;
-
     return StoreConnector<AppState, AppTab>(
       distinct: true,
       converter: (Store<AppState> store) => store.state.activeTab,
@@ -61,12 +61,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         );
       },
     );
+  }
 
-    @override
-    void dispose() {
-      _controller.dispose();
-      super.dispose();
-    }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
 
