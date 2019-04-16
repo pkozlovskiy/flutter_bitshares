@@ -9,6 +9,7 @@ Port of the https://github.com/Agorise/bitsy-wallet
 * https://github.com/go-nas/app-freenas
 * https://github.com/jasonsoft/learning-flutter
 * https://github.com/centrifugal/centrifuge-dart
+* https://github.com/marcinOz/FlutterReduxNavigation
 
 ## UI & UX:
 * https://github.com/bananocoin/kalium_wallet_flutter
@@ -25,6 +26,9 @@ Port of the https://github.com/Agorise/bitsy-wallet
 * https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
 * https://medium.com/flutter-community/flutter-layout-cheat-sheet-5363348d037e
 * https://medium.com/flutter-community/let-me-help-you-to-understand-and-choose-a-state-management-solution-for-your-app-9ffeac834ee3
+* https://medium.com/@nitishk72/flutter-advance-routing-and-navigator-df0f86f0974f
+* https://proandroiddev.com/implementing-redux-architecture-with-flutter-dd28640dd945
+* https://www.netguru.com/codestories/flutter-navigation-with-redux
 
 ## Tools:
 * https://code.visualstudio.com/

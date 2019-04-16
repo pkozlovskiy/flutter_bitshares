@@ -1,10 +1,9 @@
-import 'package:flutter_bitshares/network_service.dart';
 import 'package:test/test.dart';
 
 void main() {
-  NetworkService networkService;
+  // NetworkService networkService;
   setUpAll(() {
-    networkService = NetworkService();
+    // networkService = NetworkService();
   });
 
   group('NetworkService', () {

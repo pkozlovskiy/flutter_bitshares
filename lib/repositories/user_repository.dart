@@ -1,22 +1,19 @@
-import 'dart:async';
 import 'package:flutter_bitshares/models/api/api.dart';
 import 'package:flutter_bitshares/models/user_account.dart';
-import 'package:flutter_bitshares/network_service.dart';
+import 'package:flutter_bitshares/services/websocket_service.dart';
 import 'package:meta/meta.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserRepository {
-  final NetworkService service;
+  final WebsocketService service;
   static const String KEY_ACCOUNT_ID = 'KEY_ACCOUNT_ID';
-  final _storage = FlutterSecureStorage();
+  final SharedPreferences _storage;
 
-  UserRepository(this.service);
+  UserRepository(this.service, this._storage);
 
   Future<bool> isAuth() async {
-    String id = await _storage.read(
-      key: KEY_ACCOUNT_ID,
-    );
-    return id != null;
+    var id = _storage.getString(KEY_ACCOUNT_ID);
+    return id != null && id.isNotEmpty;
   }
 
   Future<UserAccount> signIn(
@@ -32,12 +29,12 @@ class UserRepository {
 
   Future<void> auth(UserAccount userAccount) async {
     assert(userAccount != null && userAccount.id != null);
-    await _storage.write(key: KEY_ACCOUNT_ID, value: userAccount.id);
+    await _storage.setString(KEY_ACCOUNT_ID, userAccount.id);
     return;
   }
 
   Future<void> signOut() async {
-    await _storage.delete(key: KEY_ACCOUNT_ID);
+    await _storage.setString(KEY_ACCOUNT_ID, null);
     return;
   }
 

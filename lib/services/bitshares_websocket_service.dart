@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_bitshares/models/api/api.dart';
+import 'package:flutter_bitshares/services/websocket_service.dart';
 import 'package:logging/logging.dart';
 import 'package:web_socket_channel/io.dart';
 
-class NetworkService {
+class BitsharesWebsocketService extends WebsocketService {
   final Logger log = Logger("NetworkService");
   static const int NORMAL_CLOSURE_STATUS = 1000;
   static const int GOING_AWAY_STATUS = 1001;
@@ -19,7 +20,7 @@ class NetworkService {
       ApiType.API_HISTORY |
       ApiType.API_NETWORK_BROADCAST;
 
-  static final _instance = NetworkService._internal();
+  static final _instance = BitsharesWebsocketService._internal();
 
   String _pass = "";
 
@@ -27,11 +28,11 @@ class NetworkService {
 
   static const String NODE_URL = "wss://eu.nodes.bitshares.ws";
 
-  NetworkService._internal() {
+  BitsharesWebsocketService._internal() {
     connect();
   }
 
-  factory NetworkService() {
+  factory BitsharesWebsocketService() {
     return _instance;
   }
 
