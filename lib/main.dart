@@ -1,15 +1,9 @@
-import 'package:flutter_bitshares/auth/auth_actions.dart';
-import 'package:flutter_bitshares/auth/auth_middleware.dart';
-import 'package:flutter_bitshares/auth/auth_screen.dart';
-import 'package:flutter_bitshares/balance/balance_middleware.dart';
-import 'package:flutter_bitshares/balance/balance_repository.dart';
+import 'package:flutter_bitshares/auth/auth.dart';
+import 'package:flutter_bitshares/balance/balance.dart';
+import 'package:flutter_bitshares/navigation/navigation.dart';
 import 'package:flutter_bitshares/home/home_screen.dart';
 import 'package:flutter_bitshares/models/app_state.dart';
-import 'package:flutter_bitshares/navigation/actions.dart';
-import 'package:flutter_bitshares/navigation/app_routes.dart';
-import 'package:flutter_bitshares/navigation/navigation_middleware.dart';
-import 'package:flutter_bitshares/services/bitshares_websocket_service.dart';
-import 'package:flutter_bitshares/services/websocket_service.dart';
+import 'package:flutter_bitshares/services/rpc/bitshares_websocket_service.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +11,6 @@ import 'package:flutter_bitshares/repositories/user_repository.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_bitshares/reduce/app_reducer.dart';
 import 'package:redux_logging/redux_logging.dart';
 
 final Logger log = Logger('Main');
@@ -33,9 +26,9 @@ Future main() async {
 
 Future<Store<AppState>> _createStore() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  WebsocketService _networkService = BitsharesWebsocketService();
+  var _networkService = BitsharesWebsocketService();
   var userRepository = UserRepository(_networkService, prefs);
-  var balanceRepository = BalanceRepository();
+  var balanceRepository = BalanceRepositoryImpl();
   return Store<AppState>(
     appReducer,
     middleware: []
@@ -68,9 +61,9 @@ class App extends StatelessWidget {
 
   MaterialPageRoute _getRoute(RouteSettings settings) {
     switch (settings.name) {
-      case AppRoutes.home:
+      case NavigationRoutes.home:
         return FabRoute(HomeScreen(), settings: settings);
-      case AppRoutes.auth:
+      case NavigationRoutes.auth:
         return FabRoute(AuthScreen(), settings: settings);
       default:
         return MainRoute(SplashPage(), settings: settings);
@@ -84,10 +77,11 @@ class SplashPage extends StatelessWidget {
     return StoreBuilder<AppState>(
       onInit: (store) => store.dispatch(CheckAccount(
             noAccaunt: () {
-              store.dispatch(NavigateReplaceAction(AppRoutes.home));
+              store.dispatch(NavigateReplaceAction(NavigationRoutes.home));
             },
             hasAccount: () {
-              store.dispatch(NavigateReplaceAction(AppRoutes.home));
+              store.dispatch(LoadBalanceAction()); //TODO remove
+              store.dispatch(NavigateReplaceAction(NavigationRoutes.home));
             },
           )),
       builder: (BuildContext context, Store store) => Scaffold(
@@ -110,12 +104,20 @@ void _configureLogger() {
 }
 
 _configureThemeData() {
-  return ThemeData(
-    primarySwatch: Colors.lightBlue,
-    textTheme: TextTheme(
-        title: TextStyle(fontSize: 30, color: Colors.white),
-        subtitle: TextStyle(fontSize: 20, color: Colors.white),
-        body1: TextStyle(fontSize: 15, color: Colors.white)),
+  final textTheme = ThemeData.dark().textTheme;
+  final iconTheme = ThemeData.dark().iconTheme;
+  final theme = ThemeData.dark();
+  return ThemeData.dark().copyWith(
+    indicatorColor: Color(0xFF00a9e0),
+    // appBarTheme: theme.appBarTheme.copyWith(color: ),
+    bottomAppBarTheme: theme.bottomAppBarTheme.copyWith(color: Colors.blue),
+    primaryColor: Color(0xFF3f3f3f),
+    accentColor: Color(0xFF00a9e0),
+    // buttonColor: Color(0xFF00a9e0),
+    iconTheme: iconTheme.copyWith(color: Color(0xFF00a9e0)),
+    textTheme: textTheme.copyWith(
+        body1: textTheme.body1.copyWith(
+    )),
   );
 }
 

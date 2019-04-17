@@ -1,6 +1,7 @@
-import 'package:flutter_bitshares/services/bitshares_websocket_service.dart';
-import 'package:flutter_bitshares/services/mock_websocket_service.dart';
-import 'package:flutter_bitshares/services/websocket_service.dart';
+
+import 'package:flutter_bitshares/services/rpc/bitshares_websocket_service.dart';
+import 'package:flutter_bitshares/services/rpc/mock_websocket_service.dart';
+import 'package:flutter_bitshares/services/rpc/websocket_service.dart';
 
 enum Flavor { MOCK, PRO }
 

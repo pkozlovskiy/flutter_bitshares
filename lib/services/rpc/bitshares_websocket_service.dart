@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_bitshares/models/api/api.dart';
-import 'package:flutter_bitshares/services/websocket_service.dart';
+import 'package:flutter_bitshares/services/rpc/websocket_service.dart';
 import 'package:logging/logging.dart';
 import 'package:web_socket_channel/io.dart';
 
@@ -13,6 +13,7 @@ class BitsharesWebsocketService extends WebsocketService {
   bool _loggedIn = false;
   int _currentId = 0;
   final _completers = <int, Completer<Response>>{};
+  final _callClassMap = <int, Type>{};
 
   String _lastCall;
 
@@ -69,6 +70,7 @@ class BitsharesWebsocketService extends WebsocketService {
       log.info("-> ${call.toJson()}");
       final completer = Completer<Response>.sync();
       _completers[_currentId] = completer;
+      _callClassMap[_currentId] = callable.runtimeType;
       var json = jsonEncode(call);
       _channel.sink.add(json);
       return completer.future;
@@ -139,7 +141,10 @@ class BitsharesWebsocketService extends WebsocketService {
     }
   }
 
-  void handleRpcResponce(Response response, str) {}
+  void handleRpcResponce(Response response, str) {
+    Type callClass = _callClassMap.remove(response.id);
+    if (callClass != null) {}
+  }
 
   bool isConnected() {
     return _channel != null && _loggedIn;

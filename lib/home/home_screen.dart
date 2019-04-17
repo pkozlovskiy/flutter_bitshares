@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bitshares/activity/activity_view.dart';
-import 'package:flutter_bitshares/balance/balance_view.dart';
+import 'package:flutter_bitshares/balance/balance.dart';
 import 'package:flutter_bitshares/buy/buy_view.dart';
-import 'package:flutter_bitshares/home/home_actions.dart';
+import 'package:flutter_bitshares/home/home.dart';
 import 'package:flutter_bitshares/keys.dart';
 import 'package:flutter_bitshares/models/app_state.dart';
 import 'package:flutter_bitshares/orders/orders_view.dart';
@@ -20,22 +20,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, AppTab>(
+    return StoreConnector<AppState, HomeBottomTab>(
       distinct: true,
       converter: (Store<AppState> store) => store.state.activeTab,
-      builder: (BuildContext context, AppTab activeTab) {
+      builder: (BuildContext context, HomeBottomTab activeTab) {
         _controller = new TabController(length: 2, vsync: this);
         return Scaffold(
           appBar: AppBar(
-            bottom: activeTab != AppTab.test
+            title: Text('Wallet'),
+            bottom: activeTab != HomeBottomTab.test
                 ? TabBar(
                     controller: _controller,
-                    tabs: activeTab == AppTab.account
+                    tabs: activeTab == HomeBottomTab.account
                         ? <Widget>[
                             Tab(text: 'Balance'),
                             Tab(text: 'Activity'),
                           ]
-                        : activeTab == AppTab.market
+                        : activeTab == HomeBottomTab.market
                             ? <Widget>[
                                 Tab(text: 'Orders'),
                                 Tab(text: 'Buy'),
@@ -45,12 +46,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           body: TabBarView(
             controller: _controller,
-            children: activeTab == AppTab.account
+            children: activeTab == HomeBottomTab.account
                 ? <Widget>[
                     BalanceView(),
                     ActivityView(),
                   ]
-                : activeTab == AppTab.market
+                : activeTab == HomeBottomTab.market
                     ? <Widget>[
                         OrdersView(),
                         BuyView(),
@@ -62,6 +63,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       },
     );
   }
+
+  
 
   @override
   void dispose() {
@@ -81,7 +84,7 @@ class TabSelector extends StatelessWidget {
       builder: (context, vm) {
         return BottomNavigationBar(
           key: Keys.homeTabs,
-          currentIndex: AppTab.values.indexOf(vm.activeTab),
+          currentIndex: HomeBottomTab.values.indexOf(vm.activeTab),
           onTap: vm.onTabSelected,
           items: [
             BottomNavigationBarItem(
@@ -99,7 +102,7 @@ class TabSelector extends StatelessWidget {
 }
 
 class _ViewModel {
-  final AppTab activeTab;
+  final HomeBottomTab activeTab;
   final Function(int) onTabSelected;
 
   _ViewModel({
@@ -111,7 +114,7 @@ class _ViewModel {
     return _ViewModel(
       activeTab: store.state.activeTab,
       onTabSelected: (index) {
-        store.dispatch(UpdateHomeTabAction((AppTab.values[index])));
+        store.dispatch(UpdateHomeTabAction((HomeBottomTab.values[index])));
       },
     );
   }

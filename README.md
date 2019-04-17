@@ -16,6 +16,7 @@ Port of the https://github.com/Agorise/bitsy-wallet
 * https://github.com/appditto/natrium_wallet_flutter
 * https://github.com/Blakexx/CryptoTracker
 * https://github.com/trentpiercy/trace
+* https://github.com/trentpiercy/flutter-candlesticks
 
 ## Articles:
 * https://habr.com/ru/post/438574/

@@ -1,4 +1,6 @@
 import 'package:flutter_bitshares/models/api/api.dart';
+import 'package:flutter_bitshares/models/asset.dart';
+import 'package:flutter_bitshares/models/model.dart';
 
 class Call {
   static Map<int, int> apiIds = {};
@@ -80,9 +82,20 @@ class GetFullAccounts extends Callable {
   }
 }
 
-class GetAccountBalance extends Callable {
+class GetAccountBalances extends Callable {
+  final UserAccount userAccount;
+  final List<Asset> assetList;
+
+  GetAccountBalances(this.userAccount, this.assetList);
   @override
   Call toCall(int id) {
-    return Call(id, RPC.CALL_GET_ACCOUNT_BALANCES, [], ApiType.API_NONE);
+    return Call(
+        id,
+        RPC.CALL_GET_ACCOUNT_BALANCES,
+        List<dynamic>.from([
+          userAccount.getObjectId(),
+          assetList.map((asset) => asset.getObjectId()).toList()
+        ]),
+        ApiType.API_NONE);
   }
 }

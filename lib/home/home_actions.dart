@@ -1,8 +1,7 @@
-
-enum AppTab { account, market, test }
+import 'package:flutter_bitshares/home/home.dart';
 
 class UpdateHomeTabAction {
-  final AppTab newTab;
+  final HomeBottomTab newTab;
 
   UpdateHomeTabAction(this.newTab);
 }

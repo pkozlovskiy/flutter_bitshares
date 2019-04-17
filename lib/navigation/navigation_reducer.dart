@@ -1,4 +1,4 @@
-import 'package:flutter_bitshares/navigation/actions.dart';
+import 'package:flutter_bitshares/navigation/navigation.dart';
 import 'package:redux/redux.dart';
 
 final navigationReducer = combineReducers<List<String>>([
