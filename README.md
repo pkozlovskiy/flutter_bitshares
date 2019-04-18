@@ -2,13 +2,16 @@
 Port of the https://github.com/Agorise/bitsy-wallet
 
 ## Bitshares usefull links:
-* <a href="http://docs.bitshares.org/api/websocket.html">Websocket Calls & Notifications</a>
+* https://dev.bitshares.works/en/master/api/index_api.html
+* https://github.com/bitshares/bitshares-core/wiki
+* https://github.com/bitshares-foundation/bitshares.foundation/blob/master/download/articles/BitSharesBlockchain.pdf
 
 ## Architecture:
 * https://github.com/felangel/Bloc/tree/master/examples/flutter_login
 * https://github.com/go-nas/app-freenas
 * https://github.com/jasonsoft/learning-flutter
 * https://github.com/centrifugal/centrifuge-dart
+* https://github.com/dart-lang/json_rpc_2/blob/master/lib/src/client.dart
 * https://github.com/marcinOz/FlutterReduxNavigation
 
 ## UI & UX:
