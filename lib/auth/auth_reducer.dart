@@ -1,5 +1,5 @@
 import 'package:flutter_bitshares/auth/auth_actions.dart';
-import 'package:flutter_bitshares/models/model.dart';
+import 'package:graphened/graphened.dart';
 import 'package:redux/redux.dart';
 
 final authReducer = combineReducers<UserAccount>([

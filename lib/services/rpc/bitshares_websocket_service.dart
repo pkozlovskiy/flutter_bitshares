@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter_bitshares/models/api/api.dart';
 import 'package:flutter_bitshares/services/rpc/websocket_service.dart';
+import 'package:graphened/graphened.dart';
 import 'package:logging/logging.dart';
 import 'package:web_socket_channel/io.dart';
 

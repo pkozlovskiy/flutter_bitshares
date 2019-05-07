@@ -1,20 +1,16 @@
 import 'package:flutter_bitshares/auth/auth.dart';
 import 'package:flutter_bitshares/balance/balance.dart';
 import 'package:flutter_bitshares/home/home.dart';
-import 'package:flutter_bitshares/models/balance.dart';
-import 'package:flutter_bitshares/models/model.dart';
 import 'package:flutter_bitshares/navigation/navigation.dart';
+import 'package:graphened/graphened.dart';
 import 'package:meta/meta.dart';
 
-
-AppState appReducer(AppState state, action) {
-  return AppState(
-    currentAccount: authReducer(state.currentAccount, action),
-    balance: balanceReducer(state.balance, action),
-    route: navigationReducer(state.route, action),
-    activeTab: tabsReducer(state.activeTab,action),
-  );
-}
+AppState appReducer(AppState state, action) => AppState(
+      currentAccount: authReducer(state.currentAccount, action),
+      balance: balanceReducer(state.balance, action),
+      route: navigationReducer(state.route, action),
+      activeTab: tabsReducer(state.activeTab, action),
+    );
 
 @immutable
 class AppState {

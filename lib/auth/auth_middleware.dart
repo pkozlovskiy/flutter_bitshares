@@ -1,7 +1,6 @@
+import 'package:flutter_bitshares/app_state.dart';
 import 'package:flutter_bitshares/auth/auth_actions.dart';
-import 'package:flutter_bitshares/balance/balance_action.dart';
-import 'package:flutter_bitshares/models/app_state.dart';
-import 'package:flutter_bitshares/repositories/user_repository.dart';
+import 'package:flutter_bitshares/auth/user_repository.dart';
 import 'package:redux/redux.dart';
 
 List<Middleware<AppState>> createAuthMiddleware(UserRepository userRepository) {

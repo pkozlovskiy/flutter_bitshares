@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bitshares/balance/balance.dart';
 import 'package:flutter_bitshares/keys.dart';
-import 'package:flutter_bitshares/models/model.dart';
 
 class BalanceList extends StatelessWidget {
   final List<Balance> balances;

@@ -1,13 +1,13 @@
+import 'package:flutter_bitshares/app_state.dart';
 import 'package:flutter_bitshares/auth/auth.dart';
+import 'package:flutter_bitshares/auth/user_repository.dart';
 import 'package:flutter_bitshares/balance/balance.dart';
 import 'package:flutter_bitshares/navigation/navigation.dart';
 import 'package:flutter_bitshares/home/home_screen.dart';
-import 'package:flutter_bitshares/models/app_state.dart';
 import 'package:flutter_bitshares/services/rpc/bitshares_websocket_service.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bitshares/repositories/user_repository.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,7 +28,7 @@ Future<Store<AppState>> _createStore() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var _networkService = BitsharesWebsocketService();
   var userRepository = UserRepository(_networkService, prefs);
-  var balanceRepository = BalanceRepositoryImpl();
+  var balanceRepository = BalanceRepositoryImpl(_networkService);
   return Store<AppState>(
     appReducer,
     middleware: []

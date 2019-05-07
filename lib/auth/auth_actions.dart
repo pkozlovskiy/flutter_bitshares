@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:flutter_bitshares/models/model.dart';
+import 'package:graphened/graphened.dart';
 import 'package:meta/meta.dart';
 
 class CheckAccount {

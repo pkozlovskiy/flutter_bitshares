@@ -1,6 +1,6 @@
+import 'package:flutter_bitshares/app_state.dart';
 import 'package:flutter_bitshares/balance/balance_action.dart';
 import 'package:flutter_bitshares/balance/balance_repository.dart';
-import 'package:flutter_bitshares/models/app_state.dart';
 import 'package:redux/redux.dart';
 
 List<Middleware<AppState>> createBalanceMiddleware(
@@ -15,7 +15,8 @@ void Function(
     loadBalance(BalanceRepository repository) {
   return (store, action, next) {
     next(action);
-    repository.getAll().listen((balances) {
+    
+    repository.getAll(store.state.currentAccount).listen((balances) {
       store.dispatch(BalanceLoadedAction(balances));
     });
   };

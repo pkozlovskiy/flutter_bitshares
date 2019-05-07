@@ -1,5 +1,6 @@
-import 'package:flutter_bitshares/models/api/api.dart';
+
+import 'package:graphened/graphened.dart';
 
 abstract class WebsocketService {
-  call(Callable getAccountByName);
+  Future<Response> call(Callable callable);
 }

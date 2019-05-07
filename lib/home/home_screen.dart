@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bitshares/activity/activity_view.dart';
+import 'package:flutter_bitshares/app_state.dart';
 import 'package:flutter_bitshares/balance/balance.dart';
 import 'package:flutter_bitshares/buy/buy_view.dart';
 import 'package:flutter_bitshares/home/home.dart';
 import 'package:flutter_bitshares/keys.dart';
-import 'package:flutter_bitshares/models/app_state.dart';
 import 'package:flutter_bitshares/orders/orders_view.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';

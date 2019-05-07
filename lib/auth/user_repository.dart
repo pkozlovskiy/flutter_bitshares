@@ -1,6 +1,5 @@
-import 'package:flutter_bitshares/models/api/api.dart';
-import 'package:flutter_bitshares/models/user_account.dart';
 import 'package:flutter_bitshares/services/rpc/websocket_service.dart';
+import 'package:graphened/graphened.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

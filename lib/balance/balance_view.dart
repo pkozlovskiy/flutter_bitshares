@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bitshares/balance/balance_action.dart';
-import 'package:flutter_bitshares/balance/balance_list.dart';
-import 'package:flutter_bitshares/balance/balance_selector.dart';
-import 'package:flutter_bitshares/models/app_state.dart';
-import 'package:flutter_bitshares/models/model.dart';
+import 'package:flutter_bitshares/app_state.dart';
+import 'package:flutter_bitshares/balance/balance.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
@@ -12,8 +9,7 @@ class BalanceView extends StatelessWidget {
   Widget build(BuildContext context) {
     return StoreConnector<AppState, _ViewModel>(
       onInit: (store) {
-        Future.delayed(const Duration(seconds: 1),
-            () => store.dispatch(BalanceLoadedAction([]))); //TODO remove
+        store.dispatch(LoadBalanceAction());
       },
       converter: _ViewModel.fromStore,
       builder: (context, vm) {

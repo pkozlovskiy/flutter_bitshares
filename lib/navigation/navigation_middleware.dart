@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bitshares/models/app_state.dart';
+import 'package:flutter_bitshares/app_state.dart';
 import 'package:flutter_bitshares/navigation/navigation.dart';
 import 'package:redux/redux.dart';
 

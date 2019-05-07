@@ -1,4 +1,4 @@
-import 'package:flutter_bitshares/models/app_state.dart';
-import 'package:flutter_bitshares/models/model.dart';
+import 'package:flutter_bitshares/app_state.dart';
+import 'package:flutter_bitshares/balance/balance.dart';
 
 List<Balance> balanceSelector(AppState state) => state.balance;

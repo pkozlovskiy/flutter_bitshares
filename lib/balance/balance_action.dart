@@ -1,4 +1,5 @@
-import 'package:flutter_bitshares/models/model.dart';
+
+import 'package:flutter_bitshares/balance/balance.dart';
 
 class LoadBalanceAction {}
 
