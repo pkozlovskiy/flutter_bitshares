@@ -31,11 +31,12 @@ Future<Store<AppState>> _createStore() async {
   var balanceRepository = BalanceRepositoryImpl(_networkService);
   return Store<AppState>(
     appReducer,
-    middleware: []
-      ..addAll(createAuthMiddleware(userRepository))
-      ..addAll(createNavigationMiddleware(navigatorKey))
-      ..addAll(createBalanceMiddleware(balanceRepository))
-      ..add(LoggingMiddleware.printer()),
+    middleware: [
+      ...createAuthMiddleware(userRepository),
+      ...createNavigationMiddleware(navigatorKey),
+      ...createBalanceMiddleware(balanceRepository),
+      LoggingMiddleware.printer()
+    ],
     initialState: AppState.initial(),
   );
 }
@@ -77,10 +78,9 @@ class SplashPage extends StatelessWidget {
     return StoreBuilder<AppState>(
       onInit: (store) => store.dispatch(CheckAccount(
             noAccaunt: () {
-              store.dispatch(NavigateReplaceAction(NavigationRoutes.home));
+              store.dispatch(NavigateReplaceAction(NavigationRoutes.auth));
             },
             hasAccount: () {
-              store.dispatch(LoadBalanceAction()); //TODO remove
               store.dispatch(NavigateReplaceAction(NavigationRoutes.home));
             },
           )),
