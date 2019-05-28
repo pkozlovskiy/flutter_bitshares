@@ -1,17 +1,20 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:graphened/graphened.dart';
 import 'package:meta/meta.dart';
 
 class CheckAccount {
-  final VoidCallback hasAccount;
-  final VoidCallback noAccaunt;
+  final Completer<UserAccount> completer;
 
-  CheckAccount({this.hasAccount, this.noAccaunt});
+  CheckAccount(this.completer);
 }
 
 class LogInAction {
-  LogInAction();
+  final Completer completer;
+  final String username;
+  final String pass;
+  LogInAction(this.username, this.pass, this.completer);
 }
 
 class LogInSuccessfulAction {

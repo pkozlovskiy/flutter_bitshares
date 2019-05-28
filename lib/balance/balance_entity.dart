@@ -1,7 +1,19 @@
-class Balance {
-  final String asset_id;
-  final int assetAmount;
-  final int last_update;
+import 'package:built_value/built_value.dart';
 
-  Balance(this.asset_id, this.assetAmount, this.last_update);
+part 'balance_entity.g.dart';
+
+abstract class Balance implements Built<Balance, BalanceBuilder> {
+  String get asset_id;
+  int get assetAmount;
+  int get last_update;
+
+  factory Balance() {
+    return _$Balance._(
+      asset_id: '',
+      assetAmount: 0,
+      last_update: 0,
+    );
+  }
+
+  Balance._();
 }

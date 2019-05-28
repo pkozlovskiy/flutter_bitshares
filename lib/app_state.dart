@@ -1,71 +1,54 @@
+
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
 import 'package:flutter_bitshares/auth/auth.dart';
 import 'package:flutter_bitshares/balance/balance.dart';
 import 'package:flutter_bitshares/home/home.dart';
 import 'package:flutter_bitshares/navigation/navigation.dart';
-import 'package:graphened/graphened.dart';
-import 'package:meta/meta.dart';
 
-AppState appReducer(AppState state, action) => AppState(
-      currentAccount: authReducer(state.currentAccount, action),
-      balance: balanceReducer(state.balance, action),
-      route: navigationReducer(state.route, action),
-      activeTab: tabsReducer(state.activeTab, action),
-    );
+// STARTER: import - do not remove comment
+part 'app_state.g.dart';
 
-@immutable
-class AppState {
-  final bool isLoading;
-  final HomeBottomTab activeTab;
-  final UserAccount currentAccount;
-  final List<Balance> balance;
-  final List<String> route;
+abstract class AppState implements Built<AppState, AppStateBuilder> {
+  bool get isLoading;
+  AuthState get authState;
+  // UIState get uiState;
+  BalanceState get balanceState;
+  HomeBottomTab get activeTab;
+  List<String> get route;
 
-  AppState({
-    this.isLoading = false,
-    this.activeTab = HomeBottomTab.account,
-    this.currentAccount,
-    this.balance = const [],
-    this.route = const [NavigationRoutes.splash],
-  });
-
-  factory AppState.initial() => AppState();
-
-  AppState copyWith(
-    bool isLoading,
-    HomeBottomTab activeTab,
-    UserAccount currentAccount,
-    List<Balance> balance,
-  ) {
-    return AppState(
-      isLoading: isLoading ?? this.isLoading,
-      activeTab: activeTab ?? this.activeTab,
-      currentAccount: currentAccount ?? currentAccount,
-      balance: balance ?? balance,
-      route: route ?? route,
+  factory AppState() {
+    return _$AppState._(
+      isLoading: false,
+      authState: AuthState(),
+      // uiState: UIState(),
+      balanceState: BalanceState(),
+      activeTab: HomeBottomTab.account,
+      route: [NavigationRoutes.splash]
     );
   }
 
-  @override
-  int get hashCode =>
-      route.hashCode ^
-      isLoading.hashCode ^
-      activeTab.hashCode ^
-      currentAccount.hashCode ^
-      balance.hashCode;
+  AppState._();
+  static Serializer<AppState> get serializer => _$appStateSerializer;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AppState &&
-          runtimeType == other.runtimeType &&
-          isLoading == other.isLoading &&
-          activeTab == other.activeTab &&
-          currentAccount == other.currentAccount &&
-          route == other.route &&
-          balance == other.balance;
+  // EntityUIState getUIState(EntityType type) {
+  //   switch (type) {
+  //     // STARTER: states switch - do not remove comment
+  //     default:
+  //       return null;
+  //   }
+  // }
 
+  // ListUIState getListState(EntityType type) {
+  //   return getUIState(type).listUIState;
+  // }
+
+  // STARTER: state getters - do not remove comment
+
+  /*
   @override
   String toString() {
-    return 'AppState{isLoading: $isLoading, activeTab: $activeTab, currentAccount: $currentAccount, balance: $balance, route: $route}';
+    return 'Is Loading: ${this.isLoading}';
   }
+  */
 }

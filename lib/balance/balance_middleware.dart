@@ -16,7 +16,7 @@ void Function(
   return (store, action, next) {
     next(action);
     
-    repository.getAll(store.state.currentAccount).listen((balances) {
+    repository.getAll(store.state.authState.currentAccount).listen((balances) {
       store.dispatch(BalanceLoadedAction(balances));
     });
   };

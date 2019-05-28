@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bitshares/app_state.dart';
 import 'package:flutter_bitshares/auth/auth.dart';
 import 'package:flutter_bitshares/auth/user_repository.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_bitshares/navigation/navigation.dart';
 import 'package:flutter_bitshares/home/home_screen.dart';
 import 'package:flutter_bitshares/services/rpc/bitshares_websocket_service.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:graphened/graphened.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -19,9 +22,7 @@ final navigatorKey = GlobalKey<NavigatorState>();
 Future main() async {
   _configureLogger();
   var store = await _createStore();
-  runApp(App(
-    store: store,
-  ));
+  runApp(App(store: store));
 }
 
 Future<Store<AppState>> _createStore() async {
@@ -37,9 +38,16 @@ Future<Store<AppState>> _createStore() async {
       ...createBalanceMiddleware(balanceRepository),
       LoggingMiddleware.printer()
     ],
-    initialState: AppState.initial(),
+    initialState: AppState(),
   );
 }
+
+AppState appReducer(AppState state, action) => AppState(
+    // currentAccount: authReducer(state.currentAccount, action),
+    // balance: balanceReducer(state.balance, action),
+    // route: navigationReducer(state.route, action),
+    // activeTab: tabsReducer(state.activeTab, action),
+    );
 
 class App extends StatelessWidget {
   final Store<AppState> store;
@@ -76,14 +84,17 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StoreBuilder<AppState>(
-      onInit: (store) => store.dispatch(CheckAccount(
-            noAccaunt: () {
-              store.dispatch(NavigateReplaceAction(NavigationRoutes.auth));
-            },
-            hasAccount: () {
-              store.dispatch(NavigateReplaceAction(NavigationRoutes.home));
-            },
-          )),
+      onInit: (store) {
+        var completer = Completer<UserAccount>();
+        completer.future.then((user) {
+          if (user != null)
+            store.dispatch(NavigateReplaceAction(NavigationRoutes.home));
+          else
+            store.dispatch(NavigateReplaceAction(NavigationRoutes.auth));
+        });
+
+        store.dispatch(CheckAccount(completer));
+      },
       builder: (BuildContext context, Store store) => Scaffold(
             body: Center(
               child: SvgPicture.asset('assets/images/bitshares_logo.svg'),
@@ -115,9 +126,7 @@ _configureThemeData() {
     accentColor: Color(0xFF00a9e0),
     // buttonColor: Color(0xFF00a9e0),
     iconTheme: iconTheme.copyWith(color: Color(0xFF00a9e0)),
-    textTheme: textTheme.copyWith(
-        body1: textTheme.body1.copyWith(
-    )),
+    textTheme: textTheme.copyWith(body1: textTheme.body1.copyWith()),
   );
 }
 

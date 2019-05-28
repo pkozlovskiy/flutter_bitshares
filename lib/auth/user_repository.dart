@@ -10,9 +10,9 @@ class UserRepository {
 
   UserRepository(this.service, this._storage);
 
-  Future<bool> isAuth() async {
+  Future<String> isAuth() async {
     var id = _storage.getString(KEY_ACCOUNT_ID);
-    return id != null && id.isNotEmpty;
+    return id;
   }
 
   Future<UserAccount> signIn(

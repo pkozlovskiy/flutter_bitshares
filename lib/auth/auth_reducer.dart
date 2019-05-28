@@ -1,15 +1,18 @@
-import 'package:flutter_bitshares/auth/auth_actions.dart';
-import 'package:graphened/graphened.dart';
+import 'package:flutter_bitshares/auth/auth.dart';
 import 'package:redux/redux.dart';
 
-final authReducer = combineReducers<UserAccount>([
-  TypedReducer<UserAccount, LogInSuccessfulAction>(_logIn),
-  TypedReducer<UserAccount, LogOutSuccessfulAction>(_logOut),
+final authReducer = combineReducers<AuthState>([
+  TypedReducer<AuthState, LogInSuccessfulAction>(_logIn),
+  TypedReducer<AuthState, LogOutSuccessfulAction>(_logOut),
 ]);
-UserAccount _logIn(UserAccount state, LogInSuccessfulAction action) {
-  return action.user;
+AuthState _logIn(AuthState state, LogInSuccessfulAction action) {
+  return state.rebuild(
+    (b) => b..currentAccount = action.user,
+  );
 }
 
-UserAccount _logOut(UserAccount state, LogOutSuccessfulAction action) {
-  return null;
+AuthState _logOut(AuthState state, LogOutSuccessfulAction action) {
+  return state.rebuild(
+    (b) => b..currentAccount = null,
+  );
 }
