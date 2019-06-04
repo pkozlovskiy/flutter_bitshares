@@ -1,19 +1,38 @@
-import 'package:built_value/built_value.dart';
-
+import 'package:flutter_bitshares/balance/asset_entity.dart';
+import 'package:flutter_bitshares/balance/balance_repository.dart';
+import 'package:flutter_bitshares/db.dart';
+import 'package:moor/moor.dart';
 part 'balance_entity.g.dart';
 
-abstract class Balance implements Built<Balance, BalanceBuilder> {
-  String get asset_id;
-  int get assetAmount;
-  int get last_update;
+abstract class Balances extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get assetId => text()();
+  IntColumn get assetAmount => integer()();
+  IntColumn get lastUpdate => integer()();
+}
 
-  factory Balance() {
-    return _$Balance._(
-      asset_id: '',
-      assetAmount: 0,
-      last_update: 0,
-    );
-  }
+@UseDao(tables: [Balances, Assets])
+class BalancesDao extends DatabaseAccessor<MyDatabase>
+    with _$BalancesDaoMixin
+    implements BalanceRepository {
+  BalancesDao(MyDatabase db) : super(db);
 
-  Balance._();
+  Stream<List<Balance>> get all => (select(balances)).watch();
+
+  Future<int> insert(Balance entity) => into(balances).insert(entity);
+
+  insertAll(List<Balance> entity) =>
+      into(balances).insertAll(entity, orReplace: true);
+
+  Stream<List<String>> get missingAssetIds =>  
+    customSelectStream(
+      'SELECT DISTINCT asset_id FROM balances WHERE asset_id NOT IN (SELECT id FROM assets)',
+      readsFrom: {
+        balances,
+        assets
+      }, // used for the stream: the stream will update when either table changes
+    ).map((rows) {
+      return rows.map((row) => row.readString('asset_id'));
+    });
+  
 }

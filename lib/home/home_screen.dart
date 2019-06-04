@@ -1,13 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bitshares/activity/activity_view.dart';
-import 'package:flutter_bitshares/app_state.dart';
+import 'package:flutter_bitshares/auth/auth.dart';
 import 'package:flutter_bitshares/balance/balance.dart';
 import 'package:flutter_bitshares/buy/buy_view.dart';
+import 'package:flutter_bitshares/common_widgets/platform_alert_dialog.dart';
+import 'package:flutter_bitshares/constants/strings.dart';
 import 'package:flutter_bitshares/home/home.dart';
 import 'package:flutter_bitshares/keys.dart';
 import 'package:flutter_bitshares/orders/orders_view.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux/redux.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen() : super(key: Keys.homeScreen);
@@ -16,27 +19,76 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  StreamController<HomeBottomTab> tabController;
   TabController _controller;
 
   @override
+  void initState() {
+    super.initState();
+
+    tabController = StreamController<HomeBottomTab>();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    tabController.close();
+    super.dispose();
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      final UserRepository auth =
+          Provider.of<UserRepository>(context, listen: false);
+      await auth.signOut();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> _confirmSignOut(BuildContext context) async {
+    final bool didRequestSignOut = await PlatformAlertDialog(
+      title: Strings.logout,
+      content: Strings.logoutAreYouSure,
+      cancelActionText: Strings.cancel,
+      defaultActionText: Strings.logout,
+    ).show(context);
+    if (didRequestSignOut == true) {
+      _signOut(context);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, HomeBottomTab>(
-      distinct: true,
-      converter: (Store<AppState> store) => store.state.activeTab,
-      builder: (BuildContext context, HomeBottomTab activeTab) {
+    return StreamBuilder<HomeBottomTab>(
+      initialData: HomeBottomTab.account,
+      stream: tabController.stream,
+      builder: (context, activeTabSnapshot) {
         _controller = new TabController(length: 2, vsync: this);
         return Scaffold(
           appBar: AppBar(
             title: Text('Wallet'),
-            bottom: activeTab != HomeBottomTab.test
+            actions: <Widget>[
+              FlatButton(
+                child: Text(
+                  Strings.logout,
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    color: Colors.white,
+                  ),
+                ),
+                onPressed: () => _confirmSignOut(context),
+              ),
+            ],
+            bottom: activeTabSnapshot.data != HomeBottomTab.test
                 ? TabBar(
                     controller: _controller,
-                    tabs: activeTab == HomeBottomTab.account
+                    tabs: activeTabSnapshot.data == HomeBottomTab.account
                         ? <Widget>[
                             Tab(text: 'Balance'),
                             Tab(text: 'Activity'),
                           ]
-                        : activeTab == HomeBottomTab.market
+                        : activeTabSnapshot.data == HomeBottomTab.market
                             ? <Widget>[
                                 Tab(text: 'Orders'),
                                 Tab(text: 'Buy'),
@@ -46,86 +98,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           body: TabBarView(
             controller: _controller,
-            children: activeTab == HomeBottomTab.account
+            children: activeTabSnapshot.data == HomeBottomTab.account
                 ? <Widget>[
                     BalanceView(),
                     ActivityView(),
                   ]
-                : activeTab == HomeBottomTab.market
+                : activeTabSnapshot.data == HomeBottomTab.market
                     ? <Widget>[
                         OrdersView(),
                         BuyView(),
                       ]
                     : [BalanceView()],
           ),
-          bottomNavigationBar: TabSelector(),
+          bottomNavigationBar: BottomNavigationBar(
+            key: Keys.homeTabs,
+            currentIndex: HomeBottomTab.values.indexOf(activeTabSnapshot.data),
+            onTap: (index) {
+              tabController.add(HomeBottomTab.values[index]);
+            },
+            items: [
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.account_balance_wallet),
+                  title: Text("Account")),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.account_balance), title: Text("Exchange")),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.date_range), title: Text("Test")),
+            ],
+          ),
         );
       },
     );
   }
-
-  
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-}
-
-class TabSelector extends StatelessWidget {
-  TabSelector({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return StoreConnector<AppState, _ViewModel>(
-      distinct: true,
-      converter: _ViewModel.fromStore,
-      builder: (context, vm) {
-        return BottomNavigationBar(
-          key: Keys.homeTabs,
-          currentIndex: HomeBottomTab.values.indexOf(vm.activeTab),
-          onTap: vm.onTabSelected,
-          items: [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.account_balance_wallet),
-                title: Text("Account")),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.account_balance), title: Text("Exchange")),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.date_range), title: Text("Test")),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _ViewModel {
-  final HomeBottomTab activeTab;
-  final Function(int) onTabSelected;
-
-  _ViewModel({
-    @required this.activeTab,
-    @required this.onTabSelected,
-  });
-
-  static _ViewModel fromStore(Store<AppState> store) {
-    return _ViewModel(
-      activeTab: store.state.activeTab,
-      onTabSelected: (index) {
-        store.dispatch(UpdateHomeTabAction((HomeBottomTab.values[index])));
-      },
-    );
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _ViewModel &&
-          runtimeType == other.runtimeType &&
-          activeTab == other.activeTab;
-
-  @override
-  int get hashCode => activeTab.hashCode;
 }

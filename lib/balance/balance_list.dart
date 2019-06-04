@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bitshares/balance/balance.dart';
+import 'package:flutter_bitshares/db.dart';
 import 'package:flutter_bitshares/keys.dart';
 
 class BalanceList extends StatelessWidget {
@@ -49,7 +49,7 @@ class BalanceItem extends StatelessWidget {
       children: <Widget>[
         ListTile(
           title: Text(balance.assetAmount.toString()),
-          subtitle: Text(balance.asset_id),
+          subtitle: Text(balance.assetId),
         ),
         Divider(
           height: 2,
