@@ -1,14 +1,13 @@
-import 'package:flutter_bitshares/auth/auth.dart';
-import 'package:flutter_bitshares/db.dart';
-import 'package:flutter_bitshares/navigation/navigation.dart';
-import 'package:flutter_bitshares/home/home_screen.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bitshares/auth/auth.dart';
+import 'package:flutter_bitshares/home/home_screen.dart';
+import 'package:flutter_bitshares/navigation/navigation.dart';
 import 'package:flutter_bitshares/repository_facade.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphened/graphened.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:connectivity/connectivity.dart';
 
 final log = Logger('Main');
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -27,7 +26,12 @@ class App extends StatelessWidget {
           stream: Connectivity().onConnectivityChanged,
         ),
         Provider<GlobalKey<NavigatorState>>.value(value: navigatorKey),
-        Provider<RepositoryFacade>.value(value: repositoryFacade),
+        Provider<RepositoryFacade>(
+          builder: (_) => repositoryFacade,
+          dispose: (context, repositoryFacade){
+            repositoryFacade.dispose(context);
+          },
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -74,27 +78,26 @@ class SplashPage extends StatelessWidget {
     final UserRepository userRepository =
         Provider.of<RepositoryFacade>(context, listen: false).userRepository;
     return StreamBuilder<UserAccount>(
+      initialData: userRepository.currentUser,
       stream: userRepository.onUserAccountChanged,
       builder: (_, AsyncSnapshot<UserAccount> snapshot) {
-        if (snapshot.connectionState == ConnectionState.active) {
+//        if (snapshot.connectionState == ConnectionState.active) {
           final UserAccount user = snapshot.data;
-          if (user == null) {
-            return AuthScreen();
-          } else {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Provider.of<GlobalKey<NavigatorState>>(context)
-                  .currentState
-                  .pushReplacementNamed(NavigationRoutes.home);
-              return CircularProgressIndicator();
-            });
-          }
-          return Container(width: 0.0, height: 0.0);
-        } else {
-          return Scaffold(
-              body: Center(
-            child: SvgPicture.asset('assets/images/bitshares_logo.svg'),
-          ));
-        }
+          return user.id.isEmpty ? AuthScreen() : HomeScreen();
+
+          // WidgetsBinding.instance.addPostFrameCallback((_) {
+          //   Provider.of<GlobalKey<NavigatorState>>(context)
+          //       .currentState
+          //       .pushReplacementNamed(NavigationRoutes.home);
+          //   return CircularProgressIndicator();
+          // });
+          //return Container(width: 0.0, height: 0.0);
+//        } else {
+//          return Scaffold(
+//              body: Center(
+//            child: SvgPicture.asset('assets/images/bitshares_logo.svg'),
+//          ));
+//        }
       },
     );
   }

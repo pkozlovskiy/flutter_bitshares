@@ -48,8 +48,8 @@ class BalanceItem extends StatelessWidget {
     return Column(
       children: <Widget>[
         ListTile(
-          title: Text(balance.assetAmount.toString()),
-          subtitle: Text(balance.assetId),
+          title: Text(balance.amount.toString()),
+          subtitle: Text(balance.asset_id),
         ),
         Divider(
           height: 2,

@@ -7,13 +7,19 @@ import 'package:flutter_bitshares/services/rpc/bitshares_websocket_service.dart'
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'balance/balance.dart';
+
 Future main() async {
   _configureLogger();
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+  SharedPreferences _prefs = await SharedPreferences.getInstance();
   var _networkService = BitsharesWebsocketService();
   var db = MyDatabase();
-  var userRepository = UserRepositoryImp(_networkService, prefs);
-  var balanceRepository = db.balancesDao;
+  var userRepository = UserRepositoryImp(_networkService, _prefs);
+
+  var balanceRepository = BalanceRepositoryImpl(
+      userRepository,
+      BalanceCacheDataSourceImpl(db.balancesDao),
+      BalanceRemoteDataSourceImpl(_networkService));
 
   runApp(App(
     RepositoryFacade(

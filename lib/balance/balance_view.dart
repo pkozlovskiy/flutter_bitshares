@@ -5,11 +5,10 @@ import 'package:flutter_bitshares/repository_facade.dart';
 import 'package:provider/provider.dart';
 
 class BalanceView extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
-    var balanceRepository = Provider.of<RepositoryFacade>(context).balanceRepository;
-
+    var balanceRepository =
+        Provider.of<RepositoryFacade>(context).balanceRepository;
     return StreamBuilder<List<Balance>>(
       stream: balanceRepository.all,
       builder: (_, AsyncSnapshot<List<Balance>> snapshot) {

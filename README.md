@@ -13,6 +13,7 @@ Port of the https://github.com/Agorise/bitsy-wallet
 * https://github.com/centrifugal/centrifuge-dart
 * https://github.com/dart-lang/json_rpc_2/blob/master/lib/src/client.dart
 * https://github.com/marcinOz/FlutterReduxNavigation
+* https://github.com/bizz84/firebase_auth_demo_flutter
 
 ## UI & UX:
 * https://github.com/bananocoin/kalium_wallet_flutter

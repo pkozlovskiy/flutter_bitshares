@@ -5,8 +5,9 @@ import 'package:flutter_bitshares/services/rpc/websocket_service.dart';
 import 'package:graphened/graphened.dart';
 import 'package:logging/logging.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/status.dart' as status;
 
-class BitsharesWebsocketService extends WebsocketService {
+class BitsharesWebsocketService implements WebsocketService {
   final Logger log = Logger("NetworkService");
   static const int NORMAL_CLOSURE_STATUS = 1000;
   static const int GOING_AWAY_STATUS = 1001;
@@ -38,6 +39,10 @@ class BitsharesWebsocketService extends WebsocketService {
   }
 
   IOWebSocketChannel _channel;
+  var controller = StreamController<Response>();
+
+  @override
+  Stream<Response> get messages => controller.stream;
 
   void connect() async {
     log.info("Connecting to $NODE_URL...");
@@ -143,7 +148,10 @@ class BitsharesWebsocketService extends WebsocketService {
 
   void handleRpcResponce(Response response, str) {
     Type callClass = _callClassMap.remove(response.id);
-    if (callClass != null) {}
+    if (callClass != null) {
+      response.type = callClass;
+    }
+    controller.add(response);
   }
 
   bool isConnected() {
@@ -163,5 +171,6 @@ class BitsharesWebsocketService extends WebsocketService {
   void dispose() {
     log.info("dispose...");
     if (_channel != null) _channel.sink.close(NORMAL_CLOSURE_STATUS);
+    controller.close();
   }
 }

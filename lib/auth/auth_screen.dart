@@ -5,8 +5,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class AuthScreen extends StatelessWidget {
-  final _nameController = TextEditingController();
-  final _passController = TextEditingController();
+  final _nameController = TextEditingController(text: 'evraz-pako');
+  final _passController = TextEditingController(text: 'Evraz1234567');
 
   @override
   Widget build(BuildContext context) {

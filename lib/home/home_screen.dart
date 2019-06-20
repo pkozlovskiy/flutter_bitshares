@@ -9,7 +9,9 @@ import 'package:flutter_bitshares/common_widgets/platform_alert_dialog.dart';
 import 'package:flutter_bitshares/constants/strings.dart';
 import 'package:flutter_bitshares/home/home.dart';
 import 'package:flutter_bitshares/keys.dart';
+import 'package:flutter_bitshares/navigation/navigation.dart';
 import 'package:flutter_bitshares/orders/orders_view.dart';
+import 'package:flutter_bitshares/repository_facade.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,6 +29,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.initState();
 
     tabController = StreamController<HomeBottomTab>();
+    //TODO
+    // Future.delayed(Duration.zero, () {
+    //   Provider.of<RepositoryFacade>(context)
+    //       .userRepository
+    //       .onUserAccountChanged
+    //       .listen((user) {
+    //     if (user.id.isEmpty) {
+    //       Provider.of<GlobalKey<NavigatorState>>(context)
+    //           .currentState
+    //           .pushReplacementNamed(NavigationRoutes.auth);
+    //     }
+    //   });
+    // });\
+
+        // Provider.of<RepositoryFacade>(context)
+          // .balanceRepository.
   }
 
   @override
@@ -36,17 +54,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Future<void> _signOut(BuildContext context) async {
+  Future<void> _signOut() async {
     try {
-      final UserRepository auth =
-          Provider.of<UserRepository>(context, listen: false);
-      await auth.signOut();
+      await Provider.of<RepositoryFacade>(context).userRepository.signOut();
     } catch (e) {
       print(e.toString());
     }
   }
 
-  Future<void> _confirmSignOut(BuildContext context) async {
+  Future<void> _confirmSignOut() async {
     final bool didRequestSignOut = await PlatformAlertDialog(
       title: Strings.logout,
       content: Strings.logoutAreYouSure,
@@ -54,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       defaultActionText: Strings.logout,
     ).show(context);
     if (didRequestSignOut == true) {
-      _signOut(context);
+      _signOut();
     }
   }
 
@@ -67,35 +83,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         _controller = new TabController(length: 2, vsync: this);
         return Scaffold(
           appBar: AppBar(
-            title: Text('Wallet'),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(
-                  Strings.logout,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.white,
+              title: Text('Wallet'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    Strings.logout,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.white,
+                    ),
                   ),
+                  onPressed: () => _confirmSignOut(),
                 ),
-                onPressed: () => _confirmSignOut(context),
-              ),
-            ],
-            bottom: activeTabSnapshot.data != HomeBottomTab.test
-                ? TabBar(
-                    controller: _controller,
-                    tabs: activeTabSnapshot.data == HomeBottomTab.account
-                        ? <Widget>[
-                            Tab(text: 'Balance'),
-                            Tab(text: 'Activity'),
-                          ]
-                        : activeTabSnapshot.data == HomeBottomTab.market
-                            ? <Widget>[
-                                Tab(text: 'Orders'),
-                                Tab(text: 'Buy'),
-                              ]
-                            : [Tab(text: 'Orders')])
-                : null,
-          ),
+              ],
+              bottom: activeTabSnapshot.data != HomeBottomTab.test
+                  ? TabBar(
+                      controller: _controller,
+                      tabs: activeTabSnapshot.data == HomeBottomTab.account
+                          ? <Widget>[
+                              Tab(text: 'Balance'),
+                              Tab(text: 'Activity'),
+                            ]
+                          : activeTabSnapshot.data == HomeBottomTab.market
+                              ? <Widget>[
+                                  Tab(text: 'Orders'),
+                                  Tab(text: 'Buy'),
+                                ]
+                              : [Tab(text: 'Orders')])
+                  : null),
           body: TabBarView(
             controller: _controller,
             children: activeTabSnapshot.data == HomeBottomTab.account

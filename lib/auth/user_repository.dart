@@ -5,10 +5,13 @@ import 'package:graphened/graphened.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class UserRepository {
-  Future<UserAccount> signIn(String name, String password);
-  Future<UserAccount> createUser(String name, String password);
-  Future<void> signOut();
   Stream<UserAccount> get onUserAccountChanged;
+  UserAccount get currentUser;
+  Future<UserAccount> signIn(String name, String password);
+  // Future<UserAccount> createUser(String name, String password);
+  Future<void> signOut();
+
+  dispose();
 }
 
 class UserRepositoryImp extends UserRepository {
@@ -16,14 +19,14 @@ class UserRepositoryImp extends UserRepository {
   static const String KEY_ACCOUNT_ID = 'KEY_ACCOUNT_ID';
   final SharedPreferences _storage;
 
-  UserAccount _currentUser;
+  UserAccount currentUser;
+
   StreamController _onAuthStateChangedController =
-      StreamController<UserAccount>();
+      StreamController<UserAccount>.broadcast();
 
   UserRepositoryImp(this._service, this._storage) {
-    var id = _storage.getString(KEY_ACCOUNT_ID);
-
-    _onAuthStateChangedController.add(id != null ? UserAccount(id) : null);
+    var id = _storage.getString(KEY_ACCOUNT_ID) ?? '';
+    _add(UserAccount(id));
   }
 
   @override
@@ -34,14 +37,8 @@ class UserRepositoryImp extends UserRepository {
     return userAccount;
   }
 
-  Future<void> auth(UserAccount userAccount) async {
-    assert(userAccount != null && userAccount.id != null);
-    await _storage.setString(KEY_ACCOUNT_ID, userAccount.id);
-    return;
-  }
-
   Future<void> signOut() async {
-    await _storage.setString(KEY_ACCOUNT_ID, null);
+    _add(null);
     return;
   }
 
@@ -52,17 +49,20 @@ class UserRepositoryImp extends UserRepository {
         : null;
   }
 
-  Future<UserAccount> createUser(String name, String password) {
-    return null;
-  }
-
   _add(UserAccount user) {
-    _currentUser = user;
-    _storage.setString(KEY_ACCOUNT_ID, user.id);
-    _onAuthStateChangedController.add(user);
+    currentUser = user;
+    _storage.setString(KEY_ACCOUNT_ID, user?.id);
+    _onAuthStateChangedController.add(user ?? UserAccount(""));
   }
 
   @override
   Stream<UserAccount> get onUserAccountChanged =>
       _onAuthStateChangedController.stream;
+
+  @override
+  dispose() {
+    return _onAuthStateChangedController.close();
+  }
+
+
 }
