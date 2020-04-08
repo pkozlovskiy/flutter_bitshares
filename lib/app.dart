@@ -1,37 +1,31 @@
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bitshares/auth/auth.dart';
-import 'package:flutter_bitshares/home/home_screen.dart';
-import 'package:flutter_bitshares/navigation/navigation.dart';
-import 'package:flutter_bitshares/repository_facade.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:graphened/graphened.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
+
+import 'core/common_widgets/stream_listener_builder.dart';
+import 'core/constants/navigation_routes.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/bloc/auth_event.dart';
+import 'features/auth/presentation/bloc/auth_state.dart';
+import 'features/auth/presentation/pages/auth_screen.dart';
+import 'features/home/home_screen.dart';
 
 final log = Logger('Main');
 final navigatorKey = GlobalKey<NavigatorState>();
 final routeObserver = RouteObserver<PageRoute>();
 
 class App extends StatelessWidget {
-  final RepositoryFacade repositoryFacade;
+  final List providers;
 
-  App(this.repositoryFacade);
+  App(this.providers);
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        StreamProvider<ConnectivityResult>.value(
-          stream: Connectivity().onConnectivityChanged,
-        ),
+        ...providers,
         Provider<GlobalKey<NavigatorState>>.value(value: navigatorKey),
-        Provider<RepositoryFacade>(
-          builder: (_) => repositoryFacade,
-          dispose: (context, repositoryFacade){
-            repositoryFacade.dispose(context);
-          },
-        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -68,36 +62,44 @@ _configureThemeData() {
     accentColor: Color(0xFF00a9e0),
     // buttonColor: Color(0xFF00a9e0),
     iconTheme: iconTheme.copyWith(color: Color(0xFF00a9e0)),
-    textTheme: textTheme.copyWith(body1: textTheme.body1.copyWith()),
+    textTheme: textTheme.copyWith(bodyText2: textTheme.bodyText2.copyWith()),
   );
 }
 
-class SplashPage extends StatelessWidget {
+class SplashPage extends StatefulWidget {
+  @override
+  _SplashPageState createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<AuthBloc>(context, listen: false).add(AppStarted());
+  }
+
   @override
   Widget build(BuildContext context) {
-    final UserRepository userRepository =
-        Provider.of<RepositoryFacade>(context, listen: false).userRepository;
-    return StreamBuilder<UserAccount>(
-      initialData: userRepository.currentUser,
-      stream: userRepository.onUserAccountChanged,
-      builder: (_, AsyncSnapshot<UserAccount> snapshot) {
-//        if (snapshot.connectionState == ConnectionState.active) {
-          final UserAccount user = snapshot.data;
-          return user.id.isEmpty ? AuthScreen() : HomeScreen();
+    return StreamListenableBuilder(
+      stream: Provider.of<AuthBloc>(context),
+      listener: (state) {
+        if (state is AuthenticationUninitialized) return;
+        Provider.of<GlobalKey<NavigatorState>>(context, listen: false)
+            .currentState
+            .pushReplacementNamed(state is AuthenticationAuthenticated
+                ? NavigationRoutes.home
+                : NavigationRoutes.auth);
+      },
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text(snapshot.error);
+        }
 
-          // WidgetsBinding.instance.addPostFrameCallback((_) {
-          //   Provider.of<GlobalKey<NavigatorState>>(context)
-          //       .currentState
-          //       .pushReplacementNamed(NavigationRoutes.home);
-          //   return CircularProgressIndicator();
-          // });
-          //return Container(width: 0.0, height: 0.0);
-//        } else {
-//          return Scaffold(
-//              body: Center(
-//            child: SvgPicture.asset('assets/images/bitshares_logo.svg'),
-//          ));
-//        }
+        return Scaffold(
+          body: Center(
+            child: SvgPicture.asset('assets/images/bitshares_logo.svg'),
+          ),
+        );
       },
     );
   }
@@ -152,7 +154,7 @@ class MainRoute<T> extends MaterialPageRoute<T> {
   @override
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
-    if (settings.isInitialRoute) return child;
+    if (settings.name == NavigationRoutes.splash) return child;
     // Fades between routes. (If you don't want any animation,
     // just return child.)
     return FadeTransition(opacity: animation, child: child);
@@ -168,7 +170,7 @@ class FabRoute<T> extends MaterialPageRoute<T> {
   @override
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
-    if (settings.isInitialRoute) return child;
+    if (settings.name == NavigationRoutes.splash) return child;
     return SlideTransition(
         position: new Tween<Offset>(
           begin: const Offset(0.0, 1.0),
